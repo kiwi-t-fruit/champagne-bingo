@@ -185,6 +185,7 @@
   .entry-delete:hover { color: rgba(200,80,80,0.6); }
 
   .hint { font-family: 'EB Garamond', serif; font-style: italic; font-size: 12px; color: rgba(154,122,69,0.45); text-align: center; }
+  @keyframes syncpulse { 0%,100%{opacity:1}50%{opacity:0.3} }
 </style>
 </head>
 <body>
@@ -241,6 +242,12 @@
       <div class="tag">#Eurostar</div>
     </div>
   </div>
+</div>
+
+<!-- SYNC BAR -->
+<div style="width:min(440px,100%);background:rgba(255,255,255,0.55);border:1px solid rgba(154,122,69,0.15);border-bottom:none;padding:5px 14px;display:flex;align-items:center;gap:6px;font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.15em;color:#9a8e7e;">
+  <div id="syncDot" style="width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0;transition:background 0.3s;"></div>
+  <span id="syncText">Connecting...</span>
 </div>
 
 <!-- CONTROLS -->
@@ -302,28 +309,51 @@
     { label:"Day 4", date:"Tuesday 2nd June",    tags:["#Krug","#Reims","#LastSip"] },
   ];
 
-  const STATE_KEY = 'champ_state_v2';
-  const LOG_KEY   = 'champ_log_v2';
+  const BIN_ID  = '6a1b6120ddf5aa59f779c1e2';
+  const API_KEY = '$2a$10$wYu.VAGvonHB2HvkB0czn.UyqmgWhX/i5xsL1dgq2gQjumApDjASy';
+  const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+  const HEADERS = { 'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Versioning':'false' };
 
   let state = { todayBottles:0, todayGlasses:0, tripBottles:0, tripGlasses:0, day:1, location:'Reims' };
-  let log   = []; // { id, type, name, day, location, time }
+  let log   = [];
+  let isSaving = false;
+
+  // Sync bar
+  function setSyncStatus(s, text) {
+    const dot = document.getElementById('syncDot');
+    const lbl = document.getElementById('syncText');
+    if (dot) dot.className = 'sync-dot ' + s;
+    if (lbl) lbl.textContent = text;
+  }
 
   async function loadAll() {
     try {
-      const s = await window.storage.get(STATE_KEY);
-      if (s) state = JSON.parse(s.value);
-    } catch(e) {}
-    try {
-      const l = await window.storage.get(LOG_KEY);
-      if (l) log = JSON.parse(l.value);
-    } catch(e) {}
+      setSyncStatus('syncing', 'Loading...');
+      const res = await fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+      const data = await res.json();
+      state = data.record.state || state;
+      log   = data.record.log   || [];
+      setSyncStatus('synced', 'Live · tap to update');
+    } catch(e) {
+      setSyncStatus('error', 'Could not connect');
+    }
   }
 
   async function saveAll() {
+    if (isSaving) return;
+    isSaving = true;
+    setSyncStatus('syncing', 'Saving...');
     try {
-      await window.storage.set(STATE_KEY, JSON.stringify(state));
-      await window.storage.set(LOG_KEY,   JSON.stringify(log));
-    } catch(e) {}
+      await fetch(BASE_URL, {
+        method: 'PUT',
+        headers: HEADERS,
+        body: JSON.stringify({ state, log }),
+      });
+      setSyncStatus('synced', 'Saved · ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+    } catch(e) {
+      setSyncStatus('error', 'Save failed - check connection');
+    }
+    isSaving = false;
   }
 
   function getDay() { return parseInt(document.getElementById('daySelect').value) - 1; }
@@ -471,6 +501,27 @@
 
     el.innerHTML = html;
   }
+
+  // Poll every 10 seconds for other people's updates
+  setInterval(async () => {
+    if (isSaving) return;
+    try {
+      const res = await fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+      const data = await res.json();
+      const remote = data.record;
+      if (JSON.stringify(remote.state) !== JSON.stringify(state) || JSON.stringify(remote.log) !== JSON.stringify(log)) {
+        state = remote.state || state;
+        log   = remote.log   || [];
+        document.getElementById('daySelect').value     = state.day || 1;
+        document.getElementById('locationInput').value = state.location || 'Reims';
+        updateDay();
+        updateLocation();
+        render();
+        renderDiary();
+        setSyncStatus('synced', 'Updated · ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+      }
+    } catch(e) {}
+  }, 10000);
 
   // Init
   loadAll().then(() => {

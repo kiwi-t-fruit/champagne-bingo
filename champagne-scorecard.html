@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champagne Scorecard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #9a7a45;
+    --gold-light: #b89660;
+    --cream: #faf7f2;
+    --ink: #2a2218;
+    --muted: #9a8e7e;
+    --bg: #ede8de;
+  }
+
+  body {
+    background: var(--bg);
+    min-height: 100vh;
+    font-family: 'EB Garamond', serif;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  body::before {
+    content: '';
+    display: block;
+    height: 5px;
+    background: linear-gradient(90deg, var(--gold-light), #e8d08a, var(--gold-light));
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+  }
+
+  .page-header {
+    width: min(480px, 100%);
+    text-align: center;
+    padding: 24px 0 8px;
+  }
+
+  .eyebrow {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  h1 span { color: var(--gold); }
+
+  .subtitle {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Sync bar */
+  .sync-bar {
+    width: min(480px, 100%);
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(154,122,69,0.2);
+    padding: 5px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    border-radius: 2px;
+  }
+  .sync-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ccc;
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+  .sync-dot.synced  { background: #4a9e2e; }
+  .sync-dot.syncing { background: var(--gold-light); animation: pulse 1s infinite; }
+  .sync-dot.error   { background: #c0392b; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+  /* House tabs */
+  .house-tabs {
+    width: min(480px, 100%);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .house-tab {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    padding: 5px 10px;
+    border: 1px solid rgba(154,122,69,0.25);
+    background: rgba(255,255,255,0.5);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 2px;
+  }
+  .house-tab:hover { border-color: var(--gold); color: var(--gold); }
+  .house-tab.active { background: var(--gold); color: var(--cream); border-color: var(--gold); }
+  .house-tab.rated { border-color: var(--gold-light); color: var(--gold); }
+  .house-tab.rated::after { content: ' ✓'; }
+
+  /* Scorecard */
+  .card {
+    width: min(480px, 100%);
+    background: var(--cream);
+    border: 1px solid rgba(154,122,69,0.2);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.07);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+  }
+
+  .card-inner { padding: 24px; position: relative; z-index: 1; }
+
+  .house-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .house-location {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .rule {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(154,122,69,0.25), transparent);
+    margin: 14px 0;
+  }
+
+  /* Rating rows */
+  .rating-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(154,122,69,0.08);
+  }
+  .rating-row:last-child { border-bottom: none; }
+
+  .rating-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .rating-emoji { font-size: 1.2rem; }
+
+  .stars {
+    display: flex;
+    gap: 4px;
+  }
+
+  .star {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.15s;
+    color: #ddd;
+    line-height: 1;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .star:hover { transform: scale(1.2); }
+  .star.filled { color: var(--gold-light); }
+
+  /* Notes */
+  .notes-area {
+    width: 100%;
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(154,122,69,0.2);
+    color: var(--ink);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    outline: none;
+    resize: none;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+  .notes-area:focus { border-color: rgba(154,122,69,0.45); }
+  .notes-area::placeholder { color: var(--muted); }
+
+  .save-btn {
+    width: 100%;
+    margin-top: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    padding: 11px;
+    border: none;
+    background: linear-gradient(135deg, #b89660, #9a7a45);
+    color: var(--cream);
+    cursor: pointer;
+    transition: filter 0.18s;
+  }
+  .save-btn:hover { filter: brightness(1.08); }
+
+  /* Overall score display */
+  .overall {
+    background: rgba(154,122,69,0.07);
+    border: 1px solid rgba(154,122,69,0.14);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+  }
+  .overall-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  .overall-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    line-height: 1;
+    background: linear-gradient(135deg, #b89660, #9a7a45);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Leaderboard */
+  .leaderboard {
+    width: min(480px, 100%);
+    background: var(--cream);
+    border: 1px solid rgba(154,122,69,0.2);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.05);
+  }
+
+  .lb-header {
+    padding: 14px 20px 10px;
+    border-bottom: 1px solid rgba(154,122,69,0.15);
+  }
+
+  .lb-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .lb-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(154,122,69,0.07);
+    gap: 12px;
+  }
+  .lb-row:last-child { border-bottom: none; }
+
+  .lb-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: var(--gold-light);
+    min-width: 24px;
+  }
+
+  .lb-name {
+    flex: 1;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .lb-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    color: var(--gold);
+  }
+
+  .lb-stars {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    color: var(--gold-light);
+  }
+
+  .lb-empty {
+    padding: 16px 20px;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* Add house */
+  .add-house {
+    width: min(480px, 100%);
+    display: flex;
+    gap: 8px;
+  }
+
+  .add-input {
+    flex: 1;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(154,122,69,0.25);
+    color: var(--ink);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    outline: none;
+  }
+  .add-input:focus { border-color: rgba(154,122,69,0.5); }
+  .add-input::placeholder { color: var(--muted); }
+
+  .add-btn {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 8px 16px;
+    border: 1px solid rgba(154,122,69,0.4);
+    background: transparent;
+    color: var(--gold);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { background: var(--gold); color: var(--cream); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="eyebrow">Reims &amp; Épernay · June 2025</div>
+  <h1>Champagne <span>Scorecard</span></h1>
+  <div class="subtitle">Rate each house as you go</div>
+</div>
+
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncText">Connecting...</span>
+</div>
+
+<div class="house-tabs" id="houseTabs"></div>
+
+<div class="card" id="scoreCard">
+  <div class="card-inner">
+    <div class="house-name" id="houseName">Select a house</div>
+    <div class="house-location" id="houseLocation">CHAMPAGNE REGION</div>
+    <div class="rule"></div>
+
+    <div class="rating-row">
+      <div class="rating-label"><span class="rating-emoji">🍾</span> The Fizz</div>
+      <div class="stars" id="stars-fizz"></div>
+    </div>
+    <div class="rating-row">
+      <div class="rating-label"><span class="rating-emoji">🏛️</span> The Experience</div>
+      <div class="stars" id="stars-experience"></div>
+    </div>
+    <div class="rating-row">
+      <div class="rating-label"><span class="rating-emoji">💸</span> Value for Money</div>
+      <div class="stars" id="stars-value"></div>
+    </div>
+    <div class="rating-row">
+      <div class="rating-label"><span class="rating-emoji">📸</span> Instagram Potential</div>
+      <div class="stars" id="stars-instagram"></div>
+    </div>
+
+    <textarea class="notes-area" id="notes" rows="3" placeholder="Tasting notes, highlights, controversies..."></textarea>
+
+    <button class="save-btn" onclick="saveRating()">Save Rating</button>
+
+    <div class="overall">
+      <div>
+        <div class="overall-label">Overall Score</div>
+        <div style="font-style:italic;font-size:0.75rem;color:var(--muted)">average across all categories</div>
+      </div>
+      <div class="overall-score" id="overallScore">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="leaderboard">
+  <div class="lb-header">
+    <div class="lb-title">🏆 Leaderboard</div>
+  </div>
+  <div id="leaderboard"><div class="lb-empty">No houses rated yet</div></div>
+</div>
+
+<div class="add-house">
+  <input class="add-input" id="addInput" type="text" placeholder="Add another house...">
+  <button class="add-btn" onclick="addHouse()">+ Add</button>
+</div>
+
+<script>
+const BIN_ID  = '6a1b6a3821f9ee59d29f4008';
+const API_KEY = '$2a$10$wYu.VAGvonHB2HvkB0czn.UyqmgWhX/i5xsL1dgq2gQjumApDjASy';
+const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const HEADERS = { 'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Versioning':'false' };
+
+const DEFAULT_HOUSES = [
+  { name: 'Pommery',          location: 'REIMS' },
+  { name: 'Veuve Clicquot',   location: 'REIMS' },
+  { name: 'Taittinger',       location: 'REIMS' },
+  { name: 'Boizel',           location: 'ÉPERNAY' },
+  { name: 'Perrier-Jouët',    location: 'ÉPERNAY' },
+  { name: 'Collard-Picard',   location: 'ÉPERNAY' },
+  { name: 'Moët & Chandon',   location: 'ÉPERNAY' },
+  { name: 'A. Bergère',       location: 'ÉPERNAY' },
+];
+
+const CATEGORIES = ['fizz','experience','value','instagram'];
+
+let state = {
+  houses: DEFAULT_HOUSES.map(h => ({ ...h, ratings: { fizz:0, experience:0, value:0, instagram:0 }, notes:'' })),
+  activeIndex: 0,
+};
+let isSaving = false;
+
+function setSyncStatus(s, text) {
+  document.getElementById('syncDot').className = 'sync-dot ' + s;
+  document.getElementById('syncText').textContent = text;
+}
+
+async function loadState() {
+  try {
+    setSyncStatus('syncing', 'Loading...');
+    const res = await fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+    const data = await res.json();
+    state = data.record;
+    renderAll();
+    setSyncStatus('synced', 'Live · tap to update');
+  } catch(e) {
+    setSyncStatus('error', 'Could not connect');
+    renderAll();
+  }
+}
+
+async function saveState() {
+  if (isSaving) return;
+  isSaving = true;
+  setSyncStatus('syncing', 'Saving...');
+  try {
+    await fetch(BASE_URL, { method:'PUT', headers: HEADERS, body: JSON.stringify(state) });
+    setSyncStatus('synced', 'Saved · ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  } catch(e) {
+    setSyncStatus('error', 'Save failed');
+  }
+  isSaving = false;
+}
+
+function renderAll() {
+  renderTabs();
+  renderCard();
+  renderLeaderboard();
+}
+
+function renderTabs() {
+  const wrap = document.getElementById('houseTabs');
+  wrap.innerHTML = '';
+  state.houses.forEach((h, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'house-tab' + (i === state.activeIndex ? ' active' : '') + (isRated(h) ? ' rated' : '');
+    btn.textContent = h.name;
+    btn.onclick = () => { state.activeIndex = i; renderAll(); };
+    wrap.appendChild(btn);
+  });
+}
+
+function isRated(h) {
+  return CATEGORIES.some(c => h.ratings[c] > 0);
+}
+
+function renderCard() {
+  const h = state.houses[state.activeIndex];
+  document.getElementById('houseName').textContent = h.name;
+  document.getElementById('houseLocation').textContent = h.location;
+  document.getElementById('notes').value = h.notes || '';
+
+  CATEGORIES.forEach(cat => {
+    const wrap = document.getElementById('stars-' + cat);
+    wrap.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement('span');
+      star.className = 'star' + (i <= h.ratings[cat] ? ' filled' : '');
+      star.textContent = '★';
+      star.onclick = () => setRating(cat, i);
+      wrap.appendChild(star);
+    }
+  });
+
+  const avg = getAverage(h);
+  document.getElementById('overallScore').textContent = avg > 0 ? avg.toFixed(1) + ' / 5' : '—';
+}
+
+function getAverage(h) {
+  const vals = CATEGORIES.map(c => h.ratings[c]).filter(v => v > 0);
+  if (!vals.length) return 0;
+  return vals.reduce((a,b) => a+b, 0) / vals.length;
+}
+
+function setRating(cat, val) {
+  state.houses[state.activeIndex].ratings[cat] = val;
+  renderCard();
+  renderTabs();
+}
+
+function saveRating() {
+  state.houses[state.activeIndex].notes = document.getElementById('notes').value;
+  renderLeaderboard();
+  saveState();
+}
+
+function renderLeaderboard() {
+  const lb = document.getElementById('leaderboard');
+  const rated = state.houses
+    .map((h, i) => ({ ...h, avg: getAverage(h), i }))
+    .filter(h => h.avg > 0)
+    .sort((a, b) => b.avg - a.avg);
+
+  if (!rated.length) {
+    lb.innerHTML = '<div class="lb-empty">No houses rated yet</div>';
+    return;
+  }
+
+  const medals = ['🥇','🥈','🥉'];
+  lb.innerHTML = rated.map((h, rank) => `
+    <div class="lb-row" onclick="state.activeIndex=${h.i};renderAll()">
+      <div class="lb-rank">${medals[rank] || rank+1}</div>
+      <div>
+        <div class="lb-name">${h.name}</div>
+        <div class="lb-stars">${'★'.repeat(Math.round(h.avg))}${'☆'.repeat(5-Math.round(h.avg))}</div>
+      </div>
+      <div class="lb-score">${h.avg.toFixed(1)}</div>
+    </div>
+  `).join('');
+}
+
+function addHouse() {
+  const val = document.getElementById('addInput').value.trim();
+  if (!val) return;
+  state.houses.push({ name: val, location: 'CHAMPAGNE REGION', ratings: { fizz:0, experience:0, value:0, instagram:0 }, notes:'' });
+  state.activeIndex = state.houses.length - 1;
+  document.getElementById('addInput').value = '';
+  renderAll();
+  saveState();
+}
+
+// Poll every 15 seconds
+setInterval(async () => {
+  if (isSaving) return;
+  try {
+    const res = await fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+    const data = await res.json();
+    if (JSON.stringify(data.record) !== JSON.stringify(state)) {
+      state = data.record;
+      renderAll();
+      setSyncStatus('synced', 'Updated · ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+    }
+  } catch(e) {}
+}, 15000);
+
+loadState();
+</script>
+</body>
+</html>
