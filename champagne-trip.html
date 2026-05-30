@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champagne Trip — May 30 – June 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #c8a96e;
+    --gold-light: #e2c98a;
+    --cream: #f9f5ee;
+    --ink: #1a1612;
+    --muted: #7a6e60;
+    --rule: #d9cfc0;
+    --bubble: #e8eef4;
+  }
+
+  body {
+    font-family: 'EB Garamond', Georgia, serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 40px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding-bottom: 50px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 60px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .header-eyebrow {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    margin-bottom: 14px;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 6vw, 62px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+
+  .header h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .header-sub {
+    font-size: 15px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-top: 18px;
+  }
+
+  .bubble-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 22px;
+  }
+
+  .bubble {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.3;
+    animation: rise 3s ease-in-out infinite;
+  }
+  .bubble:nth-child(2) { animation-delay: 0.4s; opacity: 0.5; }
+  .bubble:nth-child(3) { animation-delay: 0.8s; opacity: 0.7; }
+  .bubble:nth-child(4) { animation-delay: 1.2s; opacity: 0.5; }
+  .bubble:nth-child(5) { animation-delay: 1.6s; opacity: 0.3; }
+
+  @keyframes rise {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* Day blocks */
+  .day {
+    margin-bottom: 64px;
+    animation: fadeUp 0.7s ease both;
+  }
+  .day:nth-child(2) { animation-delay: 0.1s; }
+  .day:nth-child(3) { animation-delay: 0.2s; }
+  .day:nth-child(4) { animation-delay: 0.3s; }
+  .day:nth-child(5) { animation-delay: 0.4s; }
+
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .day-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--rule);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 62px;
+  }
+
+  .day-title-block {}
+  .day-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .day-label em { font-style: italic; color: var(--gold); }
+
+  .day-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* Items */
+  .items { 
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-left: 1px solid var(--rule);
+    margin-left: 10px;
+    padding-left: 28px;
+  }
+
+  .item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--rule);
+    position: relative;
+  }
+
+  .item:last-child { border-bottom: none; }
+
+  /* Timeline dot */
+  .item::before {
+    content: '';
+    position: absolute;
+    left: -34px;
+    top: 22px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--cream);
+    border: 1.5px solid var(--rule);
+  }
+
+  .item.highlight::before {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.2);
+  }
+
+  .item-time {
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    font-style: italic;
+    padding-top: 2px;
+    text-align: right;
+  }
+
+  .item-content {}
+
+  .item-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .item-detail {
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-top: 4px;
+    font-style: normal;
+    font-family: 'EB Garamond', serif;
+  }
+
+  .tag-travel { background: #edf2f7; color: #4a6580; }
+  .tag-food { background: #fdf3e7; color: #8a5e2a; }
+  .tag-wine { background: #f7f0f5; color: #7a4a6e; }
+  .tag-hotel { background: #eef5f0; color: #3a6650; }
+  .tag-maybe { background: #f5f5f0; color: var(--muted); font-style: italic; }
+
+  /* Divider */
+  .rule {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 48px 0;
+    color: var(--rule);
+  }
+  .rule::before, .rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  .rule-diamond {
+    font-size: 10px;
+    color: var(--gold);
+    opacity: 0.6;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding-top: 48px;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  .address-block {
+    display: inline-block;
+    margin: 16px auto 0;
+    padding: 12px 24px;
+    border: 1px solid var(--rule);
+    font-style: normal;
+    font-size: 14px;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 560px) {
+    .page { padding: 40px 24px 60px; }
+    .item { grid-template-columns: 65px 1fr; }
+    .day-number { font-size: 38px; min-width: 46px; }
+  }
+
+  /* Print */
+  @media print {
+    body::before { display: none; }
+    .day, .header { animation: none; opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="header">
+    <p class="header-eyebrow">Saturday 30th May — Tuesday 2nd June</p>
+    <h1>Champagne<br><em>& Beyond</em></h1>
+    <p class="header-sub">Manchester · London · Paris · Reims · Épernay</p>
+    <div class="bubble-row">
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+    </div>
+  </header>
+
+  <!-- SAT -->
+  <section class="day">
+    <div class="day-header">
+      <span class="day-number">30</span>
+      <div class="day-title-block">
+        <div class="day-label">Saturday — <em>The Journey</em></div>
+        <div class="day-subtitle">Manchester → London → Paris → Reims</div>
+      </div>
+    </div>
+    <div class="items">
+      <div class="item">
+        <div class="item-time">12:14</div>
+        <div class="item-content">
+          <div class="item-title">Manchester → London Euston</div>
+          <div class="item-detail">Arrives 14:41 &nbsp;·&nbsp; <span class="tag tag-travel">Train</span> <span class="tag tag-wine">Veuve on board 🥂</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">16:01</div>
+        <div class="item-content">
+          <div class="item-title">London St Pancras → Paris Gare du Nord</div>
+          <div class="item-detail">Eurostar · Arrives 19:59 &nbsp;·&nbsp; <span class="tag tag-travel">Eurostar</span> <span class="tag tag-wine">Bottle of Veuve on board 🥂</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">19:30</div>
+        <div class="item-content">
+          <div class="item-title">Chocho, Paris</div>
+          <div class="item-detail">Reservation for champagne — 19:30–20:30 &nbsp;·&nbsp; <span class="tag tag-wine">Champagne</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">20:58</div>
+        <div class="item-content">
+          <div class="item-title">Paris → Reims</div>
+          <div class="item-detail">Arrives 21:44 &nbsp;·&nbsp; <span class="tag tag-travel">Train</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">22:00</div>
+        <div class="item-content">
+          <div class="item-title">L'Atelier Reims</div>
+          <div class="item-detail">Steak & frites &nbsp;·&nbsp; <span class="tag tag-maybe">If we're hungry!</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">Late</div>
+        <div class="item-content">
+          <div class="item-title">Check in — Airbnb Reims</div>
+          <div class="item-detail">41 Rue du Barbâtre, Reims 51100 &nbsp;·&nbsp; <span class="tag tag-hotel">Stay</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"><span class="rule-diamond">◆</span></div>
+
+  <!-- SUN -->
+  <section class="day">
+    <div class="day-header">
+      <span class="day-number">31</span>
+      <div class="day-title-block">
+        <div class="day-label">Sunday — <em>Les Grandes Maisons</em></div>
+        <div class="day-subtitle">Reims</div>
+      </div>
+    </div>
+    <div class="items">
+      <div class="item">
+        <div class="item-time">Morning</div>
+        <div class="item-content">
+          <div class="item-title">Coffee & Pastries en route to Pommery</div>
+          <div class="item-detail">A boulangerie stop on the way &nbsp;·&nbsp; <span class="tag tag-food">Breakfast</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">11:00</div>
+        <div class="item-content">
+          <div class="item-title">Pommery</div>
+          <div class="item-detail">Booked tour + tasting &nbsp;·&nbsp; <span class="tag tag-wine">Tasting</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">12:30</div>
+        <div class="item-content">
+          <div class="item-title">Lunch at Veuve Clicquot</div>
+          <div class="item-detail"><span class="tag tag-food">Lunch</span> <span class="tag tag-wine">Champagne</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">14:30</div>
+        <div class="item-content">
+          <div class="item-title">Tastings at Taittinger</div>
+          <div class="item-detail"><span class="tag tag-wine">Tasting</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">Afternoon</div>
+        <div class="item-content">
+          <div class="item-title">Rooftop drinks at the Radisson</div>
+          <div class="item-detail"><span class="tag tag-maybe">Maybe</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">Evening</div>
+        <div class="item-content">
+          <div class="item-title">Dinner at Sacré Burger</div>
+          <div class="item-detail"><span class="tag tag-food">Dinner</span> <span class="tag tag-maybe">Maybe</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"><span class="rule-diamond">◆</span></div>
+
+  <!-- MON -->
+  <section class="day">
+    <div class="day-header">
+      <span class="day-number">1</span>
+      <div class="day-title-block">
+        <div class="day-label">Monday — <em>Avenue de Champagne</em></div>
+        <div class="day-subtitle">Reims → Épernay → Reims</div>
+      </div>
+    </div>
+    <div class="items">
+      <div class="item">
+        <div class="item-time">Morning</div>
+        <div class="item-content">
+          <div class="item-title">Coffee & Pastries</div>
+          <div class="item-detail">En route to Reims station &nbsp;·&nbsp; <span class="tag tag-food">Breakfast</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">10:49</div>
+        <div class="item-content">
+          <div class="item-title">Reims → Épernay</div>
+          <div class="item-detail">Arrives 11:23 &nbsp;·&nbsp; <span class="tag tag-travel">Train</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">11:30</div>
+        <div class="item-content">
+          <div class="item-title">Walk the Avenue de Champagne</div>
+          <div class="item-detail">Starting from the far end, working our way back through the great houses &nbsp;·&nbsp; <span class="tag tag-wine">Sightseeing</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">Afternoon</div>
+        <div class="item-content">
+          <div class="item-title">Tastings & Charcuterie along the Avenue</div>
+          <div class="item-detail">Boizel · Perrier-Jouët · Collard-Picard · Moët & Chandon · A. Bergère &nbsp;·&nbsp; <span class="tag tag-wine">Tastings</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">18:02</div>
+        <div class="item-content">
+          <div class="item-title">Épernay → Reims</div>
+          <div class="item-detail"><span class="tag tag-travel">Train</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">Evening</div>
+        <div class="item-content">
+          <div class="item-title">Dinner at Le Tablier</div>
+          <div class="item-detail">+ a final drink before bed &nbsp;·&nbsp; <span class="tag tag-food">Dinner</span> <span class="tag tag-maybe">Maybe</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"><span class="rule-diamond">◆</span></div>
+
+  <!-- TUE -->
+  <section class="day">
+    <div class="day-header">
+      <span class="day-number">2</span>
+      <div class="day-title-block">
+        <div class="day-label">Tuesday — <em>Homeward</em></div>
+        <div class="day-subtitle">Reims → Paris → London → Manchester</div>
+      </div>
+    </div>
+    <div class="items">
+      <div class="item">
+        <div class="item-time">10:00</div>
+        <div class="item-content">
+          <div class="item-title">Airbnb checkout</div>
+          <div class="item-detail">41 Rue du Barbâtre &nbsp;·&nbsp; <span class="tag tag-hotel">Checkout</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">Morning</div>
+        <div class="item-content">
+          <div class="item-title">Breakfast somewhere lovely</div>
+          <div class="item-detail"><span class="tag tag-food">Breakfast</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">~11:00</div>
+        <div class="item-content">
+          <div class="item-title">Drinks in the Krug Garden, Reims</div>
+          <div class="item-detail">Open to the public &nbsp;·&nbsp; <span class="tag tag-wine">Farewell drink</span></div>
+        </div>
+      </div>
+      <div class="item highlight">
+        <div class="item-time">~12:30</div>
+        <div class="item-content">
+          <div class="item-title">Lunch at Veuve Clicquot Café, Reims</div>
+          <div class="item-detail"><span class="tag tag-food">Lunch</span> <span class="tag tag-wine">Champagne</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">14:15</div>
+        <div class="item-content">
+          <div class="item-title">Reims → Paris</div>
+          <div class="item-detail">Arrives 15:01 &nbsp;·&nbsp; <span class="tag tag-travel">Train</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">17:02</div>
+        <div class="item-content">
+          <div class="item-title">Paris → London St Pancras</div>
+          <div class="item-detail">Eurostar · Arrives 18:30 &nbsp;·&nbsp; <span class="tag tag-travel">Eurostar</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-time">19:33</div>
+        <div class="item-content">
+          <div class="item-title">London Euston → Manchester</div>
+          <div class="item-detail">Arrives 21:45 &nbsp;·&nbsp; <span class="tag tag-travel">Train</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Four days. Four houses. Endless bubbles.<br><em>Champagne realness only.</em></p>
+    <div class="address-block">
+      Airbnb · 41 Rue du Barbâtre, Reims 51100
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
