@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champagne Bingo 🥂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6ee;
+    --paper: #f2ead6;
+    --gold: #9a7020;
+    --gold-border: #c9a84c;
+    --gold-rule: #d4b86a;
+    --dark: #1a1208;
+    --mid: #4a3c1a;
+    --unmarked-bg: #ffffff;
+    --unmarked-border: #d6c99a;
+    --unmarked-text: #2a2010;
+    --marked-bg: #f0f7e8;
+    --marked-border: #4a9e2e;
+    --marked-text: #1a5c10;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    display: block;
+    height: 5px;
+    background: linear-gradient(90deg, var(--gold-border), #e8d08a, var(--gold-border));
+  }
+
+  header {
+    text-align: center;
+    padding: 1.5rem 1rem 1.25rem;
+    border-bottom: 1px solid var(--gold-border);
+    background: var(--paper);
+  }
+  .eyebrow {
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-weight: 700;
+    font-style: italic;
+    color: var(--dark);
+    line-height: 1.1;
+  }
+  h1 span { color: var(--gold); }
+  .subtitle {
+    margin-top: 0.35rem;
+    font-size: 0.57rem;
+    letter-spacing: 0.25em;
+    color: var(--mid);
+    text-transform: uppercase;
+  }
+
+  /* Sync status */
+  .sync-bar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 0.4rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+  .sync-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ccc;
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+  .sync-dot.synced { background: #4a9e2e; }
+  .sync-dot.syncing { background: var(--gold-border); animation: pulse 1s infinite; }
+  .sync-dot.error { background: #c0392b; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Grid */
+  .grid-container {
+    max-width: 500px;
+    margin: 1.25rem auto;
+    padding: 0 0.75rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .cell {
+    background: var(--unmarked-bg);
+    border: 1.5px solid var(--unmarked-border);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    padding: 0.75rem 0.5rem;
+    min-height: 70px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    color: var(--unmarked-text);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .cell:hover { border-color: var(--gold-border); background: var(--paper); }
+  .cell.marked {
+    background: var(--marked-bg);
+    border-color: var(--marked-border);
+    color: var(--marked-text);
+    font-weight: 500;
+  }
+  .cell.marked::after {
+    content: '✓';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.65rem;
+    color: var(--marked-border);
+    font-weight: 700;
+  }
+
+  /* Score strip */
+  .score-strip {
+    background: var(--paper);
+    border-top: 1px solid var(--gold-border);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 0.9rem 0.75rem;
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .score-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .score-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: #e0d8c4;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .score-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--gold-border), #9a7020);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .score-count {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--dark);
+    white-space: nowrap;
+    min-width: 3.5rem;
+    text-align: right;
+  }
+
+  footer {
+    text-align: center;
+    padding: 1.25rem 1rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.18em;
+    color: var(--mid);
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  body::after {
+    content: '';
+    display: block;
+    height: 5px;
+    background: linear-gradient(90deg, var(--gold-border), #e8d08a, var(--gold-border));
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Reims &amp; Épernay · June 2025</div>
+  <h1>Champagne <span>Bingo</span></h1>
+  <div class="subtitle">One card · Three players · Tap to mark</div>
+</header>
+
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncText">Connecting...</span>
+</div>
+
+<div class="grid-container">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="score-strip">
+  <span class="score-label">Squares marked</span>
+  <div class="score-bar-wrap"><div class="score-bar" id="scoreBar"></div></div>
+  <span class="score-count" id="scoreCount">0 / 16</span>
+</div>
+
+<footer>Tap to mark · Tap again to unmark · First full line wins</footer>
+
+<script>
+const squares = [
+  "Someone mispronounces Moët",
+  "Tasting note includes 'brioche' or 'toasty'",
+  "Guide mentions Napoleon",
+  "Photo in front of vines",
+  "Souvenir bottle purchased",
+  "Cellar temperature lecture received unprompted",
+  "Someone asks a question they clearly googled five minutes ago",
+  "Cuvée de Prestige upsell attempted",
+  "Photo down a chalk cave corridor",
+  "Someone's glass goes missing mid-tour",
+  "A magnum is ordered",
+  "Round of 'what can you taste?' with wildly different answers",
+  "Someone claims they can taste the 'minerality'",
+  "Photo on the Boulevard des Champagnes sign",
+  "Lunch goes on significantly longer than planned",
+  "Someone does the maths on how many bottles are in the cellar",
+];
+
+// ---- JSONBIN CONFIG - fill these in ----
+const BIN_ID  = '6a1b3e5621f9ee59d29ebc85';
+const API_KEY = '$2a$10$wYu.VAGvonHB2HvkB0czn.UyqmgWhX/i5xsL1dgq2gQjumApDjASy';
+// ----------------------------------------
+
+const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const HEADERS = {
+  'Content-Type': 'application/json',
+  'X-Master-Key': API_KEY,
+  'X-Bin-Versioning': 'false',
+};
+
+let marked = new Array(16).fill(false);
+let isSaving = false;
+
+function setSyncStatus(state, text) {
+  const dot = document.getElementById('syncDot');
+  const label = document.getElementById('syncText');
+  dot.className = 'sync-dot ' + state;
+  label.textContent = text;
+}
+
+async function loadState() {
+  try {
+    setSyncStatus('syncing', 'Loading...');
+    const res = await fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+    const data = await res.json();
+    marked = data.record.marked || new Array(16).fill(false);
+    renderAll();
+    updateScore();
+    setSyncStatus('synced', 'Live · tap to update');
+  } catch(e) {
+    setSyncStatus('error', 'Could not connect');
+  }
+}
+
+async function saveState() {
+  if (isSaving) return;
+  isSaving = true;
+  setSyncStatus('syncing', 'Saving...');
+  try {
+    await fetch(BASE_URL, {
+      method: 'PUT',
+      headers: HEADERS,
+      body: JSON.stringify({ marked }),
+    });
+    setSyncStatus('synced', 'Saved · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+  } catch(e) {
+    setSyncStatus('error', 'Save failed - check connection');
+  }
+  isSaving = false;
+}
+
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  squares.forEach((text, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.id = 'cell-' + i;
+    cell.textContent = text;
+    cell.onclick = () => toggle(i);
+    grid.appendChild(cell);
+  });
+}
+
+function renderAll() {
+  squares.forEach((_, i) => {
+    document.getElementById('cell-' + i).classList.toggle('marked', marked[i]);
+  });
+}
+
+function toggle(i) {
+  marked[i] = !marked[i];
+  document.getElementById('cell-' + i).classList.toggle('marked', marked[i]);
+  updateScore();
+  saveState();
+}
+
+function updateScore() {
+  const count = marked.filter(Boolean).length;
+  document.getElementById('scoreCount').textContent = count + ' / 16';
+  document.getElementById('scoreBar').style.width = Math.round((count / 16) * 100) + '%';
+}
+
+// Poll for updates from other players every 10 seconds
+setInterval(async () => {
+  if (isSaving) return;
+  try {
+    const res = await fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+    const data = await res.json();
+    const remote = data.record.marked || [];
+    if (JSON.stringify(remote) !== JSON.stringify(marked)) {
+      marked = remote;
+      renderAll();
+      updateScore();
+      setSyncStatus('synced', 'Updated · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+    }
+  } catch(e) {}
+}, 10000);
+
+buildGrid();
+loadState();
+</script>
+</body>
+</html>
