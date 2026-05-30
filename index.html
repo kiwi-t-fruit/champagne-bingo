@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champagne Bingo 🥂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6ee;
+    --paper: #f2ead6;
+    --gold: #9a7020;
+    --gold-border: #c9a84c;
+    --dark: #1a1208;
+    --mid: #4a3c1a;
+    --unmarked-bg: #ffffff;
+    --unmarked-border: #d6c99a;
+    --unmarked-text: #2a2010;
+    --marked-bg: #f0f7e8;
+    --marked-border: #4a9e2e;
+    --marked-text: #1a5c10;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    display: block;
+    height: 6px;
+    background: linear-gradient(90deg, var(--gold-border), #e8d08a, var(--gold-border));
+  }
+
+  header {
+    text-align: center;
+    padding: 1.75rem 1rem 1.25rem;
+    border-bottom: 1px solid var(--gold-border);
+    background: var(--paper);
+  }
+  .eyebrow {
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.1;
+  }
+  h1 em { font-style: italic; color: var(--gold); }
+  .subtitle {
+    margin-top: 0.35rem;
+    font-size: 0.57rem;
+    letter-spacing: 0.25em;
+    color: var(--mid);
+    text-transform: uppercase;
+  }
+
+  /* Grid */
+  .grid-container {
+    max-width: 500px;
+    margin: 1.5rem auto;
+    padding: 0 0.75rem;
+  }
+  .col-headers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+  .col-header {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+  }
+  .cell {
+    
+    background: var(--unmarked-bg);
+    border: 1.5px solid var(--unmarked-border);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    padding: 0.75rem 0.5rem; min-height: 70px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    color: var(--unmarked-text);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .cell:hover {
+    border-color: var(--gold-border);
+    background: var(--paper);
+  }
+  .cell.marked {
+    background: var(--marked-bg);
+    border-color: var(--marked-border);
+    color: var(--marked-text);
+    font-weight: 500;
+  }
+  .cell.marked::after {
+    content: '✓';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.65rem;
+    color: var(--marked-border);
+    font-weight: 700;
+  }
+
+  /* Score strip */
+  .score-strip {
+    background: var(--paper);
+    border-top: 1px solid var(--gold-border);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 0.9rem 0.75rem;
+    max-width: 500px;
+    margin: 0 auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .score-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .score-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: #e0d8c4;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .score-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--gold-border), #9a7020);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .score-count {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--dark);
+    white-space: nowrap;
+    min-width: 3.5rem;
+    text-align: right;
+  }
+
+  /* BINGO banner */
+  .bingo-banner {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26,18,8,0.75);
+    backdrop-filter: blur(6px);
+  }
+  .bingo-banner.show { display: flex; }
+  .bingo-inner {
+    background: var(--cream);
+    border: 2px solid var(--gold-border);
+    border-radius: 6px;
+    text-align: center;
+    padding: 2.5rem 2rem;
+    max-width: 320px;
+    width: 90%;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .bingo-word {
+    font-family: 'Playfair Display', serif;
+    font-size: 4.5rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .bingo-sub {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--mid);
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+  .bingo-close {
+    margin-top: 1.5rem;
+    background: var(--dark);
+    color: var(--cream);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.7rem 1.5rem;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.2s;
+    display: block;
+    width: 100%;
+  }
+  .bingo-close:hover { background: var(--gold); }
+
+  footer {
+    text-align: center;
+    padding: 1.25rem 1rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.18em;
+    color: var(--mid);
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 99; }
+</style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="bingo-banner" id="bingoBanner">
+  <div class="bingo-inner">
+    <div class="bingo-word">BINGO!</div>
+    <div class="bingo-sub">Someone's winning at champagne 🥂</div>
+    <button class="bingo-close" onclick="closeBingo()">Continue drinking</button>
+  </div>
+</div>
+
+<header>
+  <div class="eyebrow">Reims &amp; Épernay · June 2025</div>
+  <h1>Champagne <em>Bingo</em></h1>
+  <div class="subtitle">One card · Three players · Tap to mark</div>
+</header>
+
+<div class="grid-container">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="score-strip">
+  <span class="score-label">Squares marked</span>
+  <div class="score-bar-wrap"><div class="score-bar" id="scoreBar"></div></div>
+  <span class="score-count" id="scoreCount">0 / 16</span>
+</div>
+
+<footer>Tap to mark · Tap again to unmark · First full line wins</footer>
+
+<script>
+const squares = [
+  "Someone mispronounces Moët",
+  "Tasting note includes 'brioche' or 'toasty'",
+  "Guide mentions Napoleon",
+  "Photo in front of vines",
+  "Souvenir bottle purchased",
+  "Cellar temperature lecture received unprompted",
+  "Someone asks a question they clearly googled five minutes ago",
+  "Cuvée de Prestige upsell attempted",
+  "Photo down a chalk cave corridor",
+  "Someone's glass goes missing mid-tour",
+  "A magnum is ordered",
+  "Round of 'what can you taste?' with wildly different answers",
+  "Someone claims they can taste the 'minerality'",
+  "Photo on the Boulevard des Champagnes sign",
+  "Lunch goes on significantly longer than planned",
+  "Someone does the maths on how many bottles are in the cellar",
+];
+
+const bingoLines = [
+  [0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],   // rows
+  [0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],   // cols
+  [0,5,10,15],[3,6,9,12]                             // diagonals
+];
+
+const SAVE_KEY = 'champagne-bingo-2025';
+const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
+const marked = new Array(16).fill(false).map((_, i) => saved.marked?.[i] || false);
+let bingoDone = saved.bingoDone || false;
+
+function save() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify({ marked, bingoDone }));
+}
+
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  squares.forEach((text, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.id = 'cell-' + i;
+    cell.textContent = text;
+    cell.onclick = () => toggle(i);
+    if (marked[i]) cell.classList.add('marked');
+    grid.appendChild(cell);
+  });
+}
+
+function toggle(i) {
+  marked[i] = !marked[i];
+  const cell = document.getElementById('cell-' + i);
+  cell.classList.toggle('marked', marked[i]);
+  save();
+  updateScore();
+  if (!bingoDone) checkBingo();
+}
+
+function updateScore() {
+  const count = marked.filter(Boolean).length;
+  document.getElementById('scoreCount').textContent = count + ' / 16';
+  document.getElementById('scoreBar').style.width = Math.round((count / 16) * 100) + '%';
+}
+
+function checkBingo() {
+  const won = bingoLines.some(line => line.every(i => marked[i]));
+  if (won) {
+    bingoDone = true;
+    save();
+    document.getElementById('bingoBanner').classList.add('show');
+    launchConfetti();
+  }
+}
+
+function closeBingo() {
+  document.getElementById('bingoBanner').classList.remove('show');
+}
+
+function launchConfetti() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ['#9a7020','#c9a84c','#e8d08a','#f2ead6','#4a9e2e','#ffffff','#1a3f6b'];
+  const particles = Array.from({length: 150}, () => ({
+    x: Math.random() * canvas.width, y: -10,
+    vy: 2 + Math.random() * 4, vx: (Math.random() - 0.5) * 3,
+    size: 5 + Math.random() * 8,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * 360, rotV: (Math.random() - 0.5) * 8,
+    shape: Math.random() > 0.5 ? 'rect' : 'circle',
+  }));
+  let frame;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.y += p.vy; p.x += p.vx; p.rot += p.rotV; p.vy += 0.04;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'rect') ctx.fillRect(-p.size/2, -p.size/4, p.size, p.size/2);
+      else { ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+      ctx.restore();
+    });
+    if (particles.some(p => p.y < canvas.height + 30)) frame = requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+buildGrid();
+updateScore();
+</script>
+</body>
+</html>
