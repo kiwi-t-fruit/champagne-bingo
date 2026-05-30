@@ -25,9 +25,10 @@
     justify-content: center;
     font-family: 'EB Garamond', serif;
     padding: 20px;
-    gap: 24px;
+    gap: 20px;
   }
 
+  /* ── CARD ── */
   .card {
     width: min(440px, 100%);
     background: var(--cream);
@@ -36,7 +37,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .card::before {
     content: '';
     position: absolute;
@@ -44,7 +44,6 @@
     height: 3px;
     background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
   }
-
   .card::after {
     content: '';
     position: absolute;
@@ -53,215 +52,38 @@
     pointer-events: none;
     z-index: 0;
   }
+  .card-inner { position: relative; z-index: 1; padding: 26px 26px 22px; }
 
-  .card-inner {
-    position: relative;
-    z-index: 1;
-    padding: 26px 26px 22px;
-  }
-
-  .header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 18px;
-  }
-
-  .campaign-tag {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.25em;
-    color: var(--gold);
-  }
-
-  .day-label {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--ink);
-    line-height: 1;
-    margin-top: 4px;
-  }
-
+  .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+  .campaign-tag { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.25em; color: var(--gold); }
+  .day-label { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1; margin-top: 4px; }
   .day-label em { font-style: italic; font-weight: 400; color: var(--gold); }
+  .date-label { font-family: 'EB Garamond', serif; font-style: italic; font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .location-pill { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.18em; padding: 5px 12px; border: 1px solid rgba(154,122,69,0.3); color: var(--gold); background: rgba(154,122,69,0.06); }
 
-  .date-label {
-    font-family: 'EB Garamond', serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 3px;
-  }
+  .rule { height: 1px; background: linear-gradient(to right, transparent, rgba(154,122,69,0.25), transparent); margin: 14px 0; }
 
-  .location-pill {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    padding: 5px 12px;
-    border: 1px solid rgba(154,122,69,0.3);
-    color: var(--gold);
-    background: rgba(154,122,69,0.06);
-  }
+  .counters { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 0; margin: 4px 0 8px; }
+  .counter-col { display: flex; flex-direction: column; align-items: center; padding: 8px 10px 12px; }
+  .counter-divider { background: linear-gradient(to bottom, transparent, rgba(154,122,69,0.2), transparent); margin: 8px 0; }
+  .counter-emoji { font-size: 28px; margin-bottom: 4px; filter: drop-shadow(0 1px 3px rgba(154,122,69,0.2)); }
+  .counter-type { font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 0.22em; color: var(--muted); margin-bottom: 6px; }
+  .counter-number { font-family: 'Bebas Neue', sans-serif; font-size: 72px; line-height: 0.9; background: linear-gradient(160deg, #b89660 0%, #9a7a45 50%, #6a5030 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .counter-sub { font-family: 'EB Garamond', serif; font-style: italic; font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .icons-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 8px; min-height: 28px; }
+  .icon-item { font-size: 18px; line-height: 1; animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes popIn { from { transform: scale(0) rotate(-15deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
 
-  .rule {
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(154,122,69,0.25), transparent);
-    margin: 14px 0;
-  }
-
-  .counters {
-    display: grid;
-    grid-template-columns: 1fr 1px 1fr;
-    gap: 0;
-    margin: 4px 0 8px;
-  }
-
-  .counter-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 8px 10px 12px;
-  }
-
-  .counter-divider {
-    background: linear-gradient(to bottom, transparent, rgba(154,122,69,0.2), transparent);
-    margin: 8px 0;
-  }
-
-  .counter-emoji {
-    font-size: 28px;
-    margin-bottom: 4px;
-    filter: drop-shadow(0 1px 3px rgba(154,122,69,0.2));
-  }
-
-  .counter-type {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .counter-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 72px;
-    line-height: 0.9;
-    background: linear-gradient(160deg, #b89660 0%, #9a7a45 50%, #6a5030 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .counter-sub {
-    font-family: 'EB Garamond', serif;
-    font-style: italic;
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 3px;
-  }
-
-  .icons-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 4px;
-    margin-top: 8px;
-    min-height: 28px;
-  }
-
-  .icon-item {
-    font-size: 18px;
-    line-height: 1;
-    animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
-  }
-
-  @keyframes popIn {
-    from { transform: scale(0) rotate(-15deg); opacity: 0; }
-    to   { transform: scale(1) rotate(0);      opacity: 1; }
-  }
-
-  .totals-bar {
-    background: rgba(154,122,69,0.07);
-    border: 1px solid rgba(154,122,69,0.14);
-    padding: 11px 16px;
-    display: grid;
-    grid-template-columns: 1fr 1px 1fr;
-    align-items: center;
-    gap: 8px;
-    margin-top: 4px;
-  }
-
+  .totals-bar { background: rgba(154,122,69,0.07); border: 1px solid rgba(154,122,69,0.14); padding: 11px 16px; display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; gap: 8px; margin-top: 4px; }
   .total-item { text-align: center; }
+  .total-item-label { font-family: 'Bebas Neue', sans-serif; font-size: 9px; letter-spacing: 0.2em; color: var(--muted); display: block; }
+  .total-item-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; background: linear-gradient(135deg, #b89660, #9a7a45); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .total-divider { width: 1px; height: 32px; background: rgba(154,122,69,0.2); margin: 0 auto; }
 
-  .total-item-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    color: var(--muted);
-    display: block;
-  }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+  .tag { font-family: 'Bebas Neue', sans-serif; font-size: 9px; letter-spacing: 0.15em; color: rgba(154,122,69,0.6); padding: 3px 7px; border: 1px solid rgba(154,122,69,0.15); }
 
-  .total-item-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    line-height: 1;
-    background: linear-gradient(135deg, #b89660, #9a7a45);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .total-divider {
-    width: 1px;
-    height: 32px;
-    background: rgba(154,122,69,0.2);
-    margin: 0 auto;
-  }
-
-  .tag-row {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-top: 14px;
-  }
-
-  .tag {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 9px;
-    letter-spacing: 0.15em;
-    color: rgba(154,122,69,0.6);
-    padding: 3px 7px;
-    border: 1px solid rgba(154,122,69,0.15);
-  }
-
-  /* Sync bar */
-  .sync-bar {
-    width: min(440px, 100%);
-    background: rgba(255,255,255,0.55);
-    border: 1px solid rgba(154,122,69,0.15);
-    border-bottom: none;
-    padding: 6px 16px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-  }
-  .sync-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #ccc;
-    transition: background 0.3s;
-    flex-shrink: 0;
-  }
-  .sync-dot.synced  { background: #4a9e2e; }
-  .sync-dot.syncing { background: var(--gold-light); animation: pulse 1s infinite; }
-  .sync-dot.error   { background: #c0392b; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
+  /* ── CONTROLS ── */
   .controls {
     width: min(440px, 100%);
     background: rgba(255,255,255,0.55);
@@ -271,89 +93,103 @@
     flex-direction: column;
     gap: 12px;
   }
-
-  .controls-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.25em;
-    color: var(--muted);
-  }
-
-  .ctrl-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  label {
-    font-family: 'EB Garamond', serif;
-    font-style: italic;
-    font-size: 14px;
-    color: var(--muted);
-    min-width: 96px;
-    flex-shrink: 0;
-  }
-
-  input, select {
-    flex: 1;
-    background: rgba(255,255,255,0.85);
-    border: 1px solid rgba(154,122,69,0.25);
-    color: var(--ink);
-    font-family: 'EB Garamond', serif;
-    font-size: 15px;
-    padding: 7px 10px;
-    outline: none;
-    -webkit-appearance: none;
-  }
-
+  .controls-title { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.25em; color: var(--muted); }
+  .ctrl-row { display: flex; gap: 10px; align-items: center; }
+  label { font-family: 'EB Garamond', serif; font-style: italic; font-size: 14px; color: var(--muted); min-width: 96px; flex-shrink: 0; }
+  input, select { flex: 1; background: rgba(255,255,255,0.85); border: 1px solid rgba(154,122,69,0.25); color: var(--ink); font-family: 'EB Garamond', serif; font-size: 15px; padding: 7px 10px; outline: none; -webkit-appearance: none; }
   input:focus, select:focus { border-color: rgba(154,122,69,0.5); }
   select option { background: #faf7f2; color: var(--ink); }
 
-  .section-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: rgba(154,122,69,0.5);
-    padding-bottom: 2px;
-    border-bottom: 1px solid rgba(154,122,69,0.1);
-  }
-
-  .btn-group {
-    display: flex;
-    gap: 6px;
-  }
-
-  .btn {
-    flex: 1;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 12px;
-    letter-spacing: 0.18em;
-    padding: 9px 6px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.18s;
-  }
-
+  .section-label { font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 0.2em; color: rgba(154,122,69,0.5); padding-bottom: 2px; border-bottom: 1px solid rgba(154,122,69,0.1); }
+  .btn-group { display: flex; gap: 6px; }
+  .btn { flex: 1; font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: 0.18em; padding: 9px 6px; border: none; cursor: pointer; transition: all 0.18s; }
   .btn-add-b { background: linear-gradient(135deg, #b89660, #9a7a45); color: #faf7f2; }
   .btn-add-g { background: linear-gradient(135deg, #a8b89a, #7a9870); color: #faf7f2; }
   .btn-rem   { background: transparent; border: 1px solid rgba(154,122,69,0.25); color: var(--muted); }
   .btn-reset { background: transparent; border: 1px solid rgba(220,80,80,0.2); color: rgba(200,80,80,0.5); font-size: 10px; }
-
   .btn-add-b:hover, .btn-add-g:hover { filter: brightness(1.08); }
   .btn-rem:hover   { border-color: rgba(154,122,69,0.5); color: var(--gold); }
   .btn-reset:hover { border-color: rgba(220,80,80,0.4); color: rgba(200,80,80,0.8); }
 
-  .hint {
+  /* ── DIARY ── */
+  .diary {
+    width: min(440px, 100%);
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(154,122,69,0.15);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .diary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .diary-title { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.25em; color: var(--muted); }
+
+  .diary-empty {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(154,122,69,0.4);
+    text-align: center;
+    padding: 12px 0;
+  }
+
+  .diary-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .diary-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 12px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(154,122,69,0.1);
+    animation: slideIn 0.3s ease both;
+  }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+
+  .entry-emoji { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .entry-body { flex: 1; }
+
+  .entry-name {
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .entry-meta {
     font-family: 'EB Garamond', serif;
     font-style: italic;
     font-size: 12px;
-    color: rgba(154,122,69,0.45);
-    text-align: center;
+    color: var(--muted);
+    margin-top: 1px;
   }
+
+  .entry-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: rgba(154,122,69,0.3);
+    padding: 0 2px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+  .entry-delete:hover { color: rgba(200,80,80,0.6); }
+
+  .hint { font-family: 'EB Garamond', serif; font-style: italic; font-size: 12px; color: rgba(154,122,69,0.45); text-align: center; }
 </style>
 </head>
 <body>
 
+<!-- SHAREABLE CARD -->
 <div class="card" id="card">
   <div class="card-inner">
     <div class="header">
@@ -407,11 +243,7 @@
   </div>
 </div>
 
-<div class="sync-bar">
-  <div class="sync-dot" id="syncDot"></div>
-  <span id="syncText">Connecting...</span>
-</div>
-
+<!-- CONTROLS -->
 <div class="controls">
   <div class="controls-title">Update your tracker</div>
 
@@ -430,21 +262,34 @@
     <input id="locationInput" type="text" value="Reims" oninput="updateLocation()" />
   </div>
 
+  <div class="ctrl-row">
+    <label>Name it</label>
+    <input id="nameInput" type="text" placeholder="e.g. Pommery Brut Rosé…" />
+  </div>
+
   <div class="section-label">🍾 Bottles</div>
   <div class="btn-group">
-    <button class="btn btn-add-b" onclick="add('bottles')">+ Bottle</button>
-    <button class="btn btn-rem"   onclick="remove('bottles')">− Bottle</button>
+    <button class="btn btn-add-b" onclick="add('bottles')">+ Log Bottle</button>
+    <button class="btn btn-rem"   onclick="remove('bottles')">− Remove</button>
   </div>
 
   <div class="section-label">🥂 Glasses</div>
   <div class="btn-group">
-    <button class="btn btn-add-g" onclick="add('glasses')">+ Glass</button>
-    <button class="btn btn-rem"   onclick="remove('glasses')">− Glass</button>
+    <button class="btn btn-add-g" onclick="add('glasses')">+ Log Glass</button>
+    <button class="btn btn-rem"   onclick="remove('glasses')">− Remove</button>
   </div>
 
   <div class="btn-group">
     <button class="btn btn-reset" onclick="resetDay()">Reset Today</button>
   </div>
+</div>
+
+<!-- CHAMPAGNE DIARY -->
+<div class="diary">
+  <div class="diary-header">
+    <div class="diary-title">🗒 Champagne Diary</div>
+  </div>
+  <div id="diaryList"><div class="diary-empty">Your champagne diary is empty — start logging! 🥂</div></div>
 </div>
 
 <p class="hint">Screenshot the card above to share to your stories 🥂</p>
@@ -457,66 +302,37 @@
     { label:"Day 4", date:"Tuesday 2nd June",    tags:["#Krug","#Reims","#LastSip"] },
   ];
 
-  const BIN_ID  = '6a1b6120ddf5aa59f779c1e2';
-  const API_KEY = '$2a$10$wYu.VAGvonHB2HvkB0czn.UyqmgWhX/i5xsL1dgq2gQjumApDjASy';
-  const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-  const HEADERS = {
-    'Content-Type': 'application/json',
-    'X-Master-Key': API_KEY,
-    'X-Bin-Versioning': 'false',
-  };
+  const STATE_KEY = 'champ_state_v2';
+  const LOG_KEY   = 'champ_log_v2';
 
   let state = { todayBottles:0, todayGlasses:0, tripBottles:0, tripGlasses:0, day:1, location:'Reims' };
-  let isSaving = false;
+  let log   = []; // { id, type, name, day, location, time }
 
-  function setSyncStatus(s, text) {
-    document.getElementById('syncDot').className = 'sync-dot ' + s;
-    document.getElementById('syncText').textContent = text;
-  }
-
-  async function loadState() {
+  async function loadAll() {
     try {
-      setSyncStatus('syncing', 'Loading...');
-      const res = await fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
-      const data = await res.json();
-      state = data.record;
-      applyState();
-      setSyncStatus('synced', 'Live · tap to update');
-    } catch(e) {
-      setSyncStatus('error', 'Could not connect');
-    }
-  }
-
-  async function saveState() {
-    if (isSaving) return;
-    isSaving = true;
-    setSyncStatus('syncing', 'Saving...');
+      const s = await window.storage.get(STATE_KEY);
+      if (s) state = JSON.parse(s.value);
+    } catch(e) {}
     try {
-      await fetch(BASE_URL, {
-        method: 'PUT',
-        headers: HEADERS,
-        body: JSON.stringify(state),
-      });
-      setSyncStatus('synced', 'Saved · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
-    } catch(e) {
-      setSyncStatus('error', 'Save failed - check connection');
-    }
-    isSaving = false;
+      const l = await window.storage.get(LOG_KEY);
+      if (l) log = JSON.parse(l.value);
+    } catch(e) {}
   }
 
-  function applyState() {
-    document.getElementById('daySelect').value = state.day || 1;
-    document.getElementById('locationInput').value = state.location || 'Reims';
-    updateDay();
-    updateLocation();
-    render();
+  async function saveAll() {
+    try {
+      await window.storage.set(STATE_KEY, JSON.stringify(state));
+      await window.storage.set(LOG_KEY,   JSON.stringify(log));
+    } catch(e) {}
   }
+
+  function getDay() { return parseInt(document.getElementById('daySelect').value) - 1; }
 
   function updateDay() {
-    const idx = parseInt(document.getElementById('daySelect').value) - 1;
-    state.day = idx + 1;
-    const d = days[idx];
-    document.getElementById('dayLabel').innerHTML = `Day <em>${idx+1}</em>`;
+    state.day = getDay() + 1;
+    saveAll();
+    const d = days[getDay()];
+    document.getElementById('dayLabel').innerHTML = `Day <em>${getDay()+1}</em>`;
     document.getElementById('dateLabel').textContent = d.date;
     document.getElementById('tagRow').innerHTML = d.tags.map(t=>`<div class="tag">${t}</div>`).join('');
   }
@@ -524,28 +340,72 @@
   function updateLocation() {
     const val = document.getElementById('locationInput').value || 'Champagne';
     state.location = val;
+    saveAll();
     document.getElementById('locationPill').textContent = val;
   }
 
   function add(type) {
+    const nameEl = document.getElementById('nameInput');
+    const name   = nameEl.value.trim() || (type === 'bottles' ? 'Unnamed Bottle' : 'Tasting Glass');
+    const dayIdx = getDay();
+
     if (type === 'bottles') { state.todayBottles++; state.tripBottles++; }
-    else { state.todayGlasses++; state.tripGlasses++; }
+    else                    { state.todayGlasses++; state.tripGlasses++; }
+
+    const now = new Date();
+    log.push({
+      id:       Date.now(),
+      type,
+      name,
+      day:      days[dayIdx].date,
+      location: document.getElementById('locationInput').value || 'Champagne',
+      time:     now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })
+    });
+
+    nameEl.value = '';
+    saveAll();
     render();
-    saveState();
+    renderDiary();
   }
 
   function remove(type) {
-    if (type === 'bottles' && state.todayBottles > 0) { state.todayBottles--; state.tripBottles = Math.max(0, state.tripBottles-1); }
-    if (type === 'glasses' && state.todayGlasses > 0) { state.todayGlasses--; state.tripGlasses = Math.max(0, state.tripGlasses-1); }
+    if (type === 'bottles' && state.todayBottles > 0) {
+      state.todayBottles--;
+      state.tripBottles = Math.max(0, state.tripBottles - 1);
+      // remove last bottle entry from log
+      for (let i = log.length - 1; i >= 0; i--) {
+        if (log[i].type === 'bottles') { log.splice(i, 1); break; }
+      }
+    }
+    if (type === 'glasses' && state.todayGlasses > 0) {
+      state.todayGlasses--;
+      state.tripGlasses = Math.max(0, state.tripGlasses - 1);
+      for (let i = log.length - 1; i >= 0; i--) {
+        if (log[i].type === 'glasses') { log.splice(i, 1); break; }
+      }
+    }
+    saveAll();
     render();
-    saveState();
+    renderDiary();
+  }
+
+  function deleteEntry(id) {
+    const idx = log.findIndex(e => e.id === id);
+    if (idx === -1) return;
+    const entry = log[idx];
+    if (entry.type === 'bottles') { state.todayBottles = Math.max(0, state.todayBottles-1); state.tripBottles = Math.max(0, state.tripBottles-1); }
+    else                          { state.todayGlasses = Math.max(0, state.todayGlasses-1); state.tripGlasses = Math.max(0, state.tripGlasses-1); }
+    log.splice(idx, 1);
+    saveAll();
+    render();
+    renderDiary();
   }
 
   function resetDay() {
     state.todayBottles = 0;
     state.todayGlasses = 0;
+    saveAll();
     render();
-    saveState();
   }
 
   function renderIcons(containerId, count, emoji, max) {
@@ -562,39 +422,65 @@
     if (count > max) {
       const more = document.createElement('span');
       more.className = 'icon-item';
-      more.style.fontSize = '12px';
-      more.style.color = 'var(--gold)';
-      more.style.fontFamily = "'Bebas Neue',sans-serif";
+      more.style.cssText = 'font-size:12px;color:var(--gold);font-family:"Bebas Neue",sans-serif;';
       more.textContent = `+${count - max}`;
       el.appendChild(more);
     }
   }
 
   function render() {
-    document.getElementById('bottleCount').textContent = state.todayBottles;
-    document.getElementById('glassCount').textContent  = state.todayGlasses;
+    document.getElementById('bottleCount').textContent  = state.todayBottles;
+    document.getElementById('glassCount').textContent   = state.todayGlasses;
     document.getElementById('totalBottles').textContent = state.tripBottles;
     document.getElementById('totalGlasses').textContent = state.tripGlasses;
     renderIcons('bottleIcons', state.todayBottles, '🍾', 6);
     renderIcons('glassIcons',  state.todayGlasses, '🥂', 8);
   }
 
-  // Poll every 10 seconds for updates from other people
-  setInterval(async () => {
-    if (isSaving) return;
-    try {
-      const res = await fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
-      const data = await res.json();
-      const remote = data.record;
-      if (JSON.stringify(remote) !== JSON.stringify(state)) {
-        state = remote;
-        applyState();
-        setSyncStatus('synced', 'Updated · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
-      }
-    } catch(e) {}
-  }, 10000);
+  function renderDiary() {
+    const el = document.getElementById('diaryList');
+    if (log.length === 0) {
+      el.innerHTML = '<div class="diary-empty">Your champagne diary is empty — start logging! 🥂</div>';
+      return;
+    }
 
-  loadState();
+    // Group by day
+    const grouped = {};
+    log.forEach(e => {
+      if (!grouped[e.day]) grouped[e.day] = [];
+      grouped[e.day].push(e);
+    });
+
+    let html = '';
+    Object.entries(grouped).forEach(([day, entries]) => {
+      html += `<div style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.2em;color:var(--gold);padding:8px 0 4px;">${day}</div>`;
+      html += '<div class="diary-list">';
+      entries.forEach(e => {
+        html += `
+          <div class="diary-entry">
+            <span class="entry-emoji">${e.type === 'bottles' ? '🍾' : '🥂'}</span>
+            <div class="entry-body">
+              <div class="entry-name">${e.name}</div>
+              <div class="entry-meta">${e.location} &nbsp;·&nbsp; ${e.time}</div>
+            </div>
+            <button class="entry-delete" onclick="deleteEntry(${e.id})">✕</button>
+          </div>`;
+      });
+      html += '</div>';
+    });
+
+    el.innerHTML = html;
+  }
+
+  // Init
+  loadAll().then(() => {
+    document.getElementById('daySelect').value    = state.day || 1;
+    document.getElementById('locationInput').value = state.location || 'Reims';
+    updateDay();
+    updateLocation();
+    render();
+    renderDiary();
+  });
 </script>
 </body>
 </html>
