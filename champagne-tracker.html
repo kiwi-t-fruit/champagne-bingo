@@ -314,7 +314,8 @@
   const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
   const HEADERS = { 'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Versioning':'false' };
 
-  let state = { todayBottles:0, todayGlasses:0, tripBottles:0, tripGlasses:0, day:1, location:'Reims' };
+  // State: per-day counts + location/day. Trip totals always derived from log.
+  let state = { day:1, location:'Reims', dailyBottles:{}, dailyGlasses:{} };
   let log   = [];
   let isSaving = false;
 
@@ -357,6 +358,15 @@
   }
 
   function getDay() { return parseInt(document.getElementById('daySelect').value) - 1; }
+  function getDayKey() { return 'day' + (getDay() + 1); }
+
+  // Today's counts for the current day
+  function todayBottles() { return state.dailyBottles[getDayKey()] || 0; }
+  function todayGlasses() { return state.dailyGlasses[getDayKey()] || 0; }
+
+  // Trip totals always summed from all days
+  function tripBottles() { return Object.values(state.dailyBottles).reduce((a,b) => a+b, 0); }
+  function tripGlasses() { return Object.values(state.dailyGlasses).reduce((a,b) => a+b, 0); }
 
   function updateDay() {
     state.day = getDay() + 1;
@@ -365,6 +375,7 @@
     document.getElementById('dayLabel').innerHTML = `Day <em>${getDay()+1}</em>`;
     document.getElementById('dateLabel').textContent = d.date;
     document.getElementById('tagRow').innerHTML = d.tags.map(t=>`<div class="tag">${t}</div>`).join('');
+    render();
   }
 
   function updateLocation() {
@@ -378,15 +389,20 @@
     const nameEl = document.getElementById('nameInput');
     const name   = nameEl.value.trim() || (type === 'bottles' ? 'Unnamed Bottle' : 'Tasting Glass');
     const dayIdx = getDay();
+    const key    = getDayKey();
 
-    if (type === 'bottles') { state.todayBottles++; state.tripBottles++; }
-    else                    { state.todayGlasses++; state.tripGlasses++; }
+    if (type === 'bottles') {
+      state.dailyBottles[key] = (state.dailyBottles[key] || 0) + 1;
+    } else {
+      state.dailyGlasses[key] = (state.dailyGlasses[key] || 0) + 1;
+    }
 
     const now = new Date();
     log.push({
       id:       Date.now(),
       type,
       name,
+      dayKey:   key,
       day:      days[dayIdx].date,
       location: document.getElementById('locationInput').value || 'Champagne',
       time:     now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })
@@ -399,19 +415,17 @@
   }
 
   function remove(type) {
-    if (type === 'bottles' && state.todayBottles > 0) {
-      state.todayBottles--;
-      state.tripBottles = Math.max(0, state.tripBottles - 1);
-      // remove last bottle entry from log
+    const key = getDayKey();
+    if (type === 'bottles' && todayBottles() > 0) {
+      state.dailyBottles[key] = todayBottles() - 1;
       for (let i = log.length - 1; i >= 0; i--) {
-        if (log[i].type === 'bottles') { log.splice(i, 1); break; }
+        if (log[i].type === 'bottles' && log[i].dayKey === key) { log.splice(i, 1); break; }
       }
     }
-    if (type === 'glasses' && state.todayGlasses > 0) {
-      state.todayGlasses--;
-      state.tripGlasses = Math.max(0, state.tripGlasses - 1);
+    if (type === 'glasses' && todayGlasses() > 0) {
+      state.dailyGlasses[key] = todayGlasses() - 1;
       for (let i = log.length - 1; i >= 0; i--) {
-        if (log[i].type === 'glasses') { log.splice(i, 1); break; }
+        if (log[i].type === 'glasses' && log[i].dayKey === key) { log.splice(i, 1); break; }
       }
     }
     saveAll();
@@ -423,8 +437,12 @@
     const idx = log.findIndex(e => e.id === id);
     if (idx === -1) return;
     const entry = log[idx];
-    if (entry.type === 'bottles') { state.todayBottles = Math.max(0, state.todayBottles-1); state.tripBottles = Math.max(0, state.tripBottles-1); }
-    else                          { state.todayGlasses = Math.max(0, state.todayGlasses-1); state.tripGlasses = Math.max(0, state.tripGlasses-1); }
+    const key = entry.dayKey || getDayKey();
+    if (entry.type === 'bottles') {
+      state.dailyBottles[key] = Math.max(0, (state.dailyBottles[key] || 0) - 1);
+    } else {
+      state.dailyGlasses[key] = Math.max(0, (state.dailyGlasses[key] || 0) - 1);
+    }
     log.splice(idx, 1);
     saveAll();
     render();
@@ -432,10 +450,13 @@
   }
 
   function resetDay() {
-    state.todayBottles = 0;
-    state.todayGlasses = 0;
+    const key = getDayKey();
+    state.dailyBottles[key] = 0;
+    state.dailyGlasses[key] = 0;
+    log = log.filter(e => e.dayKey !== key);
     saveAll();
     render();
+    renderDiary();
   }
 
   function renderIcons(containerId, count, emoji, max) {
@@ -459,12 +480,12 @@
   }
 
   function render() {
-    document.getElementById('bottleCount').textContent  = state.todayBottles;
-    document.getElementById('glassCount').textContent   = state.todayGlasses;
-    document.getElementById('totalBottles').textContent = state.tripBottles;
-    document.getElementById('totalGlasses').textContent = state.tripGlasses;
-    renderIcons('bottleIcons', state.todayBottles, '🍾', 6);
-    renderIcons('glassIcons',  state.todayGlasses, '🥂', 8);
+    document.getElementById('bottleCount').textContent  = todayBottles();
+    document.getElementById('glassCount').textContent   = todayGlasses();
+    document.getElementById('totalBottles').textContent = tripBottles();
+    document.getElementById('totalGlasses').textContent = tripGlasses();
+    renderIcons('bottleIcons', todayBottles(), '🍾', 6);
+    renderIcons('glassIcons',  todayGlasses(), '🥂', 8);
   }
 
   function renderDiary() {
@@ -525,10 +546,13 @@
 
   // Init
   loadAll().then(() => {
-    document.getElementById('daySelect').value    = state.day || 1;
+    document.getElementById('daySelect').value     = state.day || 1;
     document.getElementById('locationInput').value = state.location || 'Reims';
-    updateDay();
-    updateLocation();
+    const d = days[(state.day || 1) - 1];
+    document.getElementById('dayLabel').innerHTML  = `Day <em>${state.day || 1}</em>`;
+    document.getElementById('dateLabel').textContent = d.date;
+    document.getElementById('tagRow').innerHTML = d.tags.map(t=>`<div class="tag">${t}</div>`).join('');
+    document.getElementById('locationPill').textContent = state.location || 'Reims';
     render();
     renderDiary();
   });
